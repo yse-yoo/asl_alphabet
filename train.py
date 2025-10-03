@@ -9,7 +9,7 @@ IMAGE_SIZE = (64, 64)   # リサイズ先
 BATCH_SIZE = 32
 EPOCHS = 10
 DATA_DIR = "asl_alphabet_train"   # 学習用データセットのパス
-SAVE_DIR = "asl_model_saved"
+SAVE_DIR = "models"
 EXTENTION = "keras"  # "h5" or "keras"
 if not os.path.exists(SAVE_DIR):
     os.makedirs(SAVE_DIR)

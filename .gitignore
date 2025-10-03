@@ -5,6 +5,6 @@ __pycache_/
 **asl_alphabet_test/
 **asl_alphabet_train/
 **asl_finetune_data/
-**asl_model_saved/
+**models/
 .DS_Store
 *.zip
