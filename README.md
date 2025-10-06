@@ -36,7 +36,8 @@ python -m pip install -r requirements_macos.txt
 python -m pip list
 ```
 
-## Kaggle
+## ML
+### Kaggle
 ```bash
 pip install kaggle
 ```
@@ -47,6 +48,7 @@ mv kaggle.json ~/.kaggle/
 chmod 600 ~/.kaggle/kaggle.json
 ```
 
+### Dataset: ASL Alphabet
 ```bash
 unzip asl-alphabet.zip -d asl_alphabet
 ```

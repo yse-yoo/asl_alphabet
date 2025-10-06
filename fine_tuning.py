@@ -14,9 +14,9 @@ FINETUNE_DATA_DIR = "asl_finetune_data"
 SAVE_PATH = "models/asl_model_finetuned.keras"
 
 # ==============================
-# 学習対象クラスを指定（例: A, B, C のみ）
+# 学習対象クラスを指定（例: A, B, nothing のみ）
 # ==============================
-TARGET_CLASSES = ["A", "B", "C"]
+TARGET_CLASSES = ["A", "B", "C", "nothing"]
 
 # ==============================
 # データセットの読み込み

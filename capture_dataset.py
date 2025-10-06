@@ -64,11 +64,14 @@ if not cap.isOpened():
 
 print("✅ カメラ起動成功 (GUIでクラス指定可能)")
 
-img_count = 0
+# クラスごとに保存済み数を記録（フォルダ内ファイル数から初期化）
+img_counts = {}
+for cls in classes:
+    folder = os.path.join(DATA_DIR, cls)
+    existing_files = [f for f in os.listdir(folder) if f.lower().endswith((".jpg", ".png"))]
+    img_counts[cls] = len(existing_files)
 
 def capture_loop():
-    global img_count
-
     ret, frame = cap.read()
     if not ret:
         root.after(10, capture_loop)
@@ -88,10 +91,9 @@ def capture_loop():
             bbox = (min_x, min_y, max_x, max_y)
             mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
-    # GUIで選択中のクラス
     current_class = selected_class.get()
+    img_count = img_counts[current_class]
 
-    # 画面にクラス表示
     cv2.putText(frame, f"Class: {current_class} | Saved: {img_count}",
                 (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
 
@@ -103,10 +105,14 @@ def capture_loop():
         crop = frame[min_y:max_y, min_x:max_x]
 
         save_path = os.path.join(DATA_DIR, current_class, f"{current_class}_{img_count:03d}.jpg")
-        cv2.imwrite(save_path, crop)
-        print(f"💾 保存: {save_path}")
-        img_count += 1
-        status_label.config(text=f"保存しました ({current_class})", fg="blue")
+        if not os.path.exists(save_path):  # 既に存在しない場合のみ保存
+            cv2.imwrite(save_path, crop)
+            print(f"💾 保存: {save_path}")
+            img_counts[current_class] += 1
+            status_label.config(text=f"保存しました ({current_class})", fg="blue")
+        else:
+            print(f"⚠️ スキップ: {save_path} は既に存在します")
+
         save_flag.set(False)
 
     cv2.imshow("ASL Hand Capture", frame)
@@ -115,6 +121,8 @@ def capture_loop():
     key = cv2.waitKey(1) & 0xFF
     if key == ord("q"):
         root.quit()
+    elif key == ord("s"):
+        trigger_save()
 
     root.after(10, capture_loop)
 
