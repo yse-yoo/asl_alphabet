@@ -2,9 +2,8 @@
 __pycache_/
 *.pyc
 *.h5
-**asl_alphabet_test/
-**asl_alphabet_train/
-**asl_finetune_data/
+**asl_*/
 **models/
 .DS_Store
 *.zip
+custom_test/

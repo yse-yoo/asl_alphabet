@@ -64,7 +64,7 @@ if not cap.isOpened():
 
 print("✅ カメラ起動成功 (GUIでクラス指定可能)")
 
-# クラスごとに保存済み数を記録（フォルダ内ファイル数から初期化）
+# クラスごとに保存済み数を記録
 img_counts = {}
 for cls in classes:
     folder = os.path.join(DATA_DIR, cls)
@@ -105,7 +105,7 @@ def capture_loop():
         crop = frame[min_y:max_y, min_x:max_x]
 
         save_path = os.path.join(DATA_DIR, current_class, f"{current_class}_{img_count:03d}.jpg")
-        if not os.path.exists(save_path):  # 既に存在しない場合のみ保存
+        if not os.path.exists(save_path):
             cv2.imwrite(save_path, crop)
             print(f"💾 保存: {save_path}")
             img_counts[current_class] += 1
@@ -116,17 +116,20 @@ def capture_loop():
         save_flag.set(False)
 
     cv2.imshow("ASL Hand Capture", frame)
-
-    # Qキーでも終了可能
-    key = cv2.waitKey(1) & 0xFF
-    if key == ord("q"):
-        root.quit()
-    elif key == ord("s"):
-        trigger_save()
-
     root.after(10, capture_loop)
 
+# 🔹ここが重要！Tkinterキーイベント登録
+def on_key(event):
+    if event.keysym.lower() == 's':
+        trigger_save()
+    elif event.keysym.lower() == 'q':
+        root.quit()
+
+root.bind('<Key>', on_key)  # ← ← ← ★これを忘れずに！
+
+# =========================
 # GUI + OpenCV 並列実行
+# =========================
 root.after(10, capture_loop)
 root.mainloop()
 
