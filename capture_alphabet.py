@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import ttk
 
 # 保存先フォルダ
-DATA_DIR = "asl_finetune_data"
+DATA_DIR = "asl_alphabet_train"
 
 # クラス一覧（A〜Z + space + nothing）
 classes = [chr(i) for i in range(ord("A"), ord("Z")+1)] + ["space", "nothing"]

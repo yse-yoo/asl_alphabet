@@ -8,8 +8,7 @@ import math
 # パラメータ
 # ==============================
 IMAGE_SIZE = (64, 64)
-MODEL_PATH = "asl_model_saved/asl_model.keras"
-# TEST_DIR = "asl_alphabet_test"
+MODEL_PATH = "models/asl_alphabet_model.keras"
 TEST_DIR = "custom_test"
 
 if not os.path.exists(TEST_DIR):

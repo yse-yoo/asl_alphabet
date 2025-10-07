@@ -2,7 +2,7 @@ import cv2
 import os
 import mediapipe as mp
 
-SAVE_DIR = "asl_finetune_data/nothing"
+SAVE_DIR = "asl_words_train/nothing"
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 cap = cv2.VideoCapture(0)

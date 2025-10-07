@@ -39,7 +39,7 @@ python -m pip list
 ### Dataset
 #### For training
 ```bash
-asl_words_data/
+asl_words_train/
 - I_Love_You/
 - Yes/
 - No/
@@ -63,7 +63,7 @@ python capture_words.py
 ```
 
 ### Training
-training by images of asl_words_data/
+training by images of asl_words_train/
 
 ```bash
 python train_words.py

@@ -9,7 +9,7 @@ BATCH_SIZE = 32
 EPOCHS = 5
 LEARNING_RATE = 1e-5
 
-BASE_MODEL_PATH = "models/asl_model.keras"
+BASE_MODEL_PATH = "models/asl_words_model.keras"
 FINETUNE_DATA_DIR = "asl_finetune_data"
 SAVE_PATH = "models/asl_model_finetuned.keras"
 

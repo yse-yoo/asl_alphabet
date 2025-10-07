@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import ttk
 
 # 保存先フォルダ
-DATA_DIR = "asl_words_data"
+DATA_DIR = "asl_words_train"
 
 # クラス一覧（ASL単語カテゴリ）
 classes = [
