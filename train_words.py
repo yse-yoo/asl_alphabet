@@ -1,3 +1,5 @@
+from asl_config import ASL_CLASSES, DATA_DIR, MODEL_DIR, EXTENTION
+
 import tensorflow as tf
 import numpy as np
 import os
@@ -8,27 +10,15 @@ import os
 IMAGE_SIZE = (64, 64)
 BATCH_SIZE = 32
 EPOCHS = 10
-DATA_DIR = "asl_words_train"   # ← データディレクトリ
-SAVE_DIR = "models"
-EXTENTION = "keras"
-os.makedirs(SAVE_DIR, exist_ok=True)
-SAVE_PATH = os.path.join(SAVE_DIR, f"asl_words_model.{EXTENTION}")
-print(f"✅ モデル保存先: {SAVE_PATH}")
+
+os.makedirs(MODEL_DIR, exist_ok=True)
+MODEL_PATH = os.path.join(MODEL_DIR, f"asl_words_model.{EXTENTION}")
+print(f"✅ モデル保存先: {MODEL_PATH}")
 
 # ==============================
 # クラス名リスト
 # ==============================
-classes = [
-    "I_Love_You",
-    "Yes",
-    "No",
-    "Hello",
-    "Thank_You",
-    "Good",
-    "Sorry",
-    "Please",
-    "Nothing"
-]
+classes = ASL_CLASSES
 
 # 各フォルダ存在チェック
 for cls in classes:
@@ -112,5 +102,5 @@ history = model.fit(
 # ==============================
 # 保存
 # ==============================
-model.save(SAVE_PATH)
-print(f"✅ モデルを保存しました: {SAVE_PATH}")
+model.save(MODEL_PATH)
+print(f"✅ モデルを保存しました: {MODEL_PATH}")

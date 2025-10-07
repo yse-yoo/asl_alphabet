@@ -45,7 +45,7 @@ asl_words_train/
 - No/
 - Hello/
 - Thank_You/
-- Good/
+- Fine/
 - Sorry/
 - Please/
 - Nothing/

@@ -1,3 +1,5 @@
+from asl_config import ASL_CLASSES, DATA_DIR, TEST_DIR, MODEL_DIR, EXTENTION, IMAGE_SIZE
+
 import tensorflow as tf
 import numpy as np
 import os
@@ -7,9 +9,7 @@ import math
 # ==============================
 # パラメータ
 # ==============================
-IMAGE_SIZE = (64, 64)
-MODEL_PATH = "models/asl_words_model.keras"
-TEST_DIR = "custom_test"
+MODEL_PATH = os.path.join(MODEL_DIR, f"asl_words_model.{EXTENTION}")
 
 if not os.path.exists(TEST_DIR):
     raise FileNotFoundError(f"テスト用ディレクトリが存在しません: {TEST_DIR}")
@@ -22,7 +22,7 @@ if not os.path.exists(MODEL_PATH):
 model = tf.keras.models.load_model(MODEL_PATH)
 
 # クラス名の一覧（train.pyと同じ順序）
-class_names = sorted(os.listdir("asl_words_train"))
+class_names = ASL_CLASSES
 print("クラス数:", len(class_names))
 print("クラス一覧:", class_names)
 
