@@ -35,32 +35,42 @@ python -m pip install -r requirements_macos.txt
 ```bash
 python -m pip list
 ```
-
 ## ML
-### Kaggle
+### Dataset
+#### For training
 ```bash
-pip install kaggle
+asl_words_data/
+- I_Love_You/
+- Yes/
+- No/
+- Hello/
+- Thank_You/
+- Good/
+- Sorry/
+- Please/
+- Nothing/
 ```
 
+#### For predict
 ```bash
-mkdir -p ~/.kaggle
-mv kaggle.json ~/.kaggle/
-chmod 600 ~/.kaggle/kaggle.json
+custom_test/*.jpg
 ```
 
-### Dataset: ASL Alphabet
+#### Capture
+capture images (100)
 ```bash
-unzip asl-alphabet.zip -d asl_alphabet
+python capture_words.py
 ```
 
-## Mac TensorFlow Metal
+### Training
+training by images of asl_words_data/
+
 ```bash
-pip uninstall tensorflow
-pip install tensorflow-macos
-pip install tensorflow-metal
+python train_words.py
 ```
 
-## サーバ起動
+### Predict
+predict by images of custom_test/
 ```bash
-uvicorn app:app --reload --port 8000  
+python predict_words.py
 ```

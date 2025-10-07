@@ -27,7 +27,7 @@ classes = [
     "Good",
     "Sorry",
     "Please",
-    "Nothing"  # 👈 追加（何もしていない状態）
+    "Nothing"
 ]
 
 # 各フォルダ存在チェック
