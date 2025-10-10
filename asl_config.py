@@ -10,6 +10,7 @@ ASL_CLASSES = [
     # "Please",
 ]
 
+ALPHABET_DIR = "asl_alphabet_train"
 DATA_DIR = "asl_words_train"
 MODEL_DIR = "models"
 TEST_DIR ="asl_words_test"

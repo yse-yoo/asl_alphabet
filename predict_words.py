@@ -51,9 +51,6 @@ rows = 2
 per_page = cols * rows
 rows = math.ceil(num_files / cols)
 
-fig, axes = plt.subplots(rows, cols, figsize=(15, 3*rows))
-axes = axes.flatten()
-
 for page in range(math.ceil(len(files) / per_page)):
     start = page * per_page
     end = start + per_page
