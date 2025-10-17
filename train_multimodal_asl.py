@@ -25,15 +25,46 @@ def load_image(path, size=(64, 64)):
 
 
 def load_landmarks(json_path):
+    """Pose(33点) + Hands(最大2×21点) を統合してベクトル化"""
     if not os.path.exists(json_path):
-        return np.zeros((21 * 3,), dtype=np.float32)
+        return np.zeros((225,), dtype=np.float32)
+
     with open(json_path, "r") as f:
         data = json.load(f)
-    if not data or len(data) == 0:
-        return np.zeros((21 * 3,), dtype=np.float32)
-    # 1つ目の手だけを使う（複数ある場合は先頭）
-    coords = np.array([[lm["x_norm"], lm["y_norm"], lm["z_norm"]] for lm in data[0]], dtype=np.float32)
-    return coords.flatten()
+
+    # フォーマットチェック
+    if not isinstance(data, dict):
+        # 旧形式（手だけ）の場合
+        if isinstance(data, list) and len(data) > 0:
+            coords = np.array([[lm["x_norm"], lm["y_norm"], lm["z_norm"]] for lm in data[0]], dtype=np.float32)
+            flat = coords.flatten()
+            return np.pad(flat, (0, 225 - len(flat)))[:225]
+        else:
+            return np.zeros((225,), dtype=np.float32)
+
+    # --- Pose 33点 ---
+    pose_points = []
+    if "pose" in data and isinstance(data["pose"], list):
+        for lm in data["pose"]:
+            pose_points.extend([lm["x_norm"], lm["y_norm"], lm["z_norm"]])
+
+    # --- Hands 21点×N ---
+    hand_points = []
+    if "hands" in data and isinstance(data["hands"], list):
+        for hand in data["hands"]:
+            for lm in hand:
+                hand_points.extend([lm["x_norm"], lm["y_norm"], lm["z_norm"]])
+
+    # --- 結合 ---
+    combined = np.array(pose_points + hand_points, dtype=np.float32)
+
+    # 必要に応じてゼロパディング（最大225次元）
+    if len(combined) < 225:
+        combined = np.pad(combined, (0, 225 - len(combined)))
+    else:
+        combined = combined[:225]
+
+    return combined
 
 
 def load_dataset(base_dir, classes, image_size=(64, 64)):
@@ -71,7 +102,6 @@ print(f"クラス数: {num_classes} | サンプル数: {len(y)}")
 # ==============================
 # モデル構築
 # ==============================
-# エイリアスを設定（import省略の代わり）
 layers = tf.keras.layers
 models = tf.keras.models
 Input = tf.keras.Input
@@ -94,10 +124,10 @@ x2 = layers.MaxPooling2D()(x2)
 x2 = layers.Flatten()(x2)
 x2 = layers.Dense(64, activation="relu")(x2)
 
-# --- landmarks (63次元: x,y,z * 21点) ---
-land_input = Input(shape=(63,))
-x3 = layers.Dense(64, activation="relu")(land_input)
-x3 = layers.Dense(32, activation="relu")(x3)
+# --- landmarks (Pose + Hands 合計225次元) ---
+land_input = Input(shape=(225,))
+x3 = layers.Dense(128, activation="relu")(land_input)
+x3 = layers.Dense(64, activation="relu")(x3)
 
 # --- 結合 ---
 merged = layers.concatenate([x1, x2, x3])
@@ -116,7 +146,7 @@ history = model.fit(
     [X_img, X_skel, X_land],
     y,
     validation_split=0.2,
-    epochs=15,
+    epochs=20,
     batch_size=32
 )
 
