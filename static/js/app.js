@@ -113,15 +113,22 @@ function sendUpperBody() {
     const data = await res.json();
 
     if (res.ok) {
-      let message = `${data.predicted_class} (${(data.confidence * 100).toFixed(2)}%)`;
+      let message = `${data.label} (${(data.confidence * 100).toFixed(2)}%)`;
       document.getElementById("res-class").textContent = message;
       const imgEl = document.getElementById("res-image");
       imgEl.src = `${data.image_url}?t=${Date.now()}`;
       imgEl.classList.remove("hidden");
+
+      speachText(data.label);
     }
   }, "image/jpeg");
 }
 
+function speachText(text) {
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "en-US";
+  speechSynthesis.speak(utterance);
+}
 
 function getBoundingBox(hands, poses) {
   const xs = [];

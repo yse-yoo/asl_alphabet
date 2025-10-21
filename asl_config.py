@@ -3,12 +3,15 @@ ASL_CLASSES = [
     "I_Love_You",
     "Nothing",
     "Thank_You",
-    # "Yes",
-    # "No",
-    # "Fine",
-    # "Sorry",
-    # "Please",
 ]
+
+# 表示用マッピング
+LABEL_MAP = {
+    "Hello": "Hello",
+    "I_Love_You": "I Love You",
+    "Nothing": "Nothing",
+    "Thank_You": "Thank You",
+}
 
 ALPHABET_DIR = "asl_alphabet_train"
 DATA_DIR = "asl_words_train"

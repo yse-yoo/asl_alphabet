@@ -1,4 +1,5 @@
 from asl_config import ASL_CLASSES, DATA_DIR, MODEL_DIR, EXTENTION, IMAGE_SIZE, MARGIN
+from utils.labels import normalize_label
 import os, io, json
 import numpy as np
 import tensorflow as tf
@@ -141,6 +142,7 @@ async def predict(file: UploadFile = File(...)):
     return {
         "filename": file.filename,
         "predicted_class": pred_class,
+        "label": normalize_label(pred_class),
         "confidence": round(float(confidence), 2),
         "image_url": f"/static/uploads/{file.filename}"
     }
