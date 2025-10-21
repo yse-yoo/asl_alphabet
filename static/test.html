@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASL Alphabet Predictor</title>
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <nav class="mb-6 w-full max-w-6xl">
+        <ul class="flex py-4 border-b p-4 bg-white shadow-lg rounded-lg">
+            <li><a href="/" class="text-blue-600 hover:underline mr-4">Home</a></li>
+            <li><a href="/app" class="text-blue-600 hover:underline mr-4">Camera App</a></li>
+            <li><a href="/test" class="text-blue-600 hover:underline">Image Upload Test</a></li>
+        </ul>
+    </nav>
+    <main class="flex flex-col items-center justify-center bg-gray-100 p-4 space-y-6">
+        <div class="bg-white shadow-lg p-8 w-full max-w-6xl rounded-lg">
+            <h1 class="text-2xl font-bold text-center mb-6">ASL Alphabet Prediction</h1>
+
+            <!-- Upload Form -->
+            <form id="upload-form" enctype="multipart/form-data" class="space-y-4">
+                <!-- id を追加 -->
+                <input id="file-input" type="file" name="file" accept="image/*" required
+                    class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button type="submit"
+                    class="w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-blue-700 transition">
+                    Predict
+                </button>
+            </form>
+
+            <!-- Prediction Result -->
+            <div id="result-container" class="mt-6 hidden">
+                <div id="alphabet" class="text-3xl font-bold text-center"></div>
+                <div class="flext justify-center my-4">
+                    <img id="sign-image" src="" alt="" class="mx-auto max-h-48 rounded-lg shadow-lg" />
+                </div>
+                <pre id="result" class="bg-gray-100 p-4 rounded-lg text-sm text-gray-700"></pre>
+            </div>
+
+            <!-- Sample Images -->
+            <h2 class="text-lg font-semibold mt-8 mb-4">Sample Images (A-Z)</h2>
+            <div id="sample-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+                <!-- JSで自動生成 -->
+            </div>
+        </div>
+    </main>
+
+    <!-- 外部JS -->
+    <script src="/static/js/test.js"></script>
+</body>
+
+</html>

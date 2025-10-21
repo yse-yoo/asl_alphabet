@@ -74,3 +74,9 @@ predict by images of custom_test/
 ```bash
 python predict_words.py
 ```
+
+
+## サーバ起動
+```bash
+uvicorn main:app --reload --port 8000  
+```
