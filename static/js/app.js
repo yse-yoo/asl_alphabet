@@ -88,6 +88,36 @@ async function detect() {
   requestAnimationFrame(detect);
 }
 
+function sendFullFrame() {
+  const sendCanvas = document.createElement("canvas");
+  const sendCtx = sendCanvas.getContext("2d");
+  sendCanvas.width = video.videoWidth;
+  sendCanvas.height = video.videoHeight;
+
+  sendCtx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+
+  sendCanvas.toBlob(async (blob) => {
+    const formData = new FormData();
+    formData.append("file", blob, "frame.jpg");
+
+    const res = await fetch("/predict", { method: "POST", body: formData });
+    const data = await res.json();
+
+    if (res.ok) {
+      let message = `${data.label} (${(data.confidence * 100).toFixed(2)}%)`;
+      document.getElementById("res-class").textContent = message;
+      const imgEl = document.getElementById("res-image");
+      imgEl.src = `${data.image_url}?t=${Date.now()}`;
+      imgEl.classList.remove("hidden");
+
+      if (data.label !== "Nothing") {
+        speachText(data.label);
+      }
+    }
+  }, "image/jpeg");
+}
+
+
 // 🔘 上半身ごと送信
 function sendUpperBody() {
   const bbox = getBoundingBox(latestHands, latestPoses);
@@ -119,6 +149,7 @@ function sendUpperBody() {
       imgEl.src = `${data.image_url}?t=${Date.now()}`;
       imgEl.classList.remove("hidden");
 
+      if (data.label == "Nothing") return;
       speachText(data.label);
     }
   }, "image/jpeg");
@@ -164,15 +195,32 @@ function getBoundingBox(hands, poses) {
 }
 
 
-sendBtn.addEventListener("click", sendUpperBody);
+sendBtn.addEventListener("click", sendFullFrame);
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") sendUpperBody();
+  if (event.key === "Enter") sendFullFrame();
 });
 
 async function main() {
-  await setupCamera();
-  await setupModels();
-  detect();
+  // 🌀 ローディングモーダルを表示
+  const loadingModal = document.getElementById("loadingModal");
+  loadingModal.classList.remove("hidden");
+  loadingModal.style.opacity = "1";
+
+  try {
+    await setupCamera();
+    await setupModels();
+    console.log("✅ Camera & Models ready");
+
+    // モーダルフェードアウト
+    loadingModal.style.opacity = "0";
+    setTimeout(() => loadingModal.style.display = "none", 600);
+
+    detect();
+  } catch (err) {
+    console.error("❌ 初期化エラー:", err);
+    document.querySelector("#loadingModal p").textContent = "Error loading models.";
+  }
 }
+
 
 main();

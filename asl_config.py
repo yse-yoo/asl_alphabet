@@ -13,6 +13,7 @@ LABEL_MAP = {
     "Thank_You": "Thank You",
 }
 
+USE_MODEL="asl_multimodal_model_hands"
 ALPHABET_DIR = "asl_alphabet_train"
 DATA_DIR = "asl_words_train"
 MODEL_DIR = "models"

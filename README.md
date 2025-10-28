@@ -80,3 +80,8 @@ python predict_words.py
 ```bash
 uvicorn main:app --reload --port 8000  
 ```
+
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
+

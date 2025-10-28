@@ -7,3 +7,4 @@ __pycache_/
 .DS_Store
 *.zip
 custom_test/
+static/uploads/
