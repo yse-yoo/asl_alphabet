@@ -77,11 +77,17 @@ python predict_words.py
 
 
 ## サーバ起動
+### main.py の場合
 ```bash
 uvicorn main:app --reload --port 8000  
 ```
 
 ```bash
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+### app.py の場合
+```bash
+uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 ```
 
