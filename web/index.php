@@ -1,42 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 
 <head>
-    <meta charset="utf-8">
-    <title>ASL Realtime (WebCam + FastAPI)</title>
-    <style>
-        body {
-            background: #111;
-            color: #fff;
-            font-family: sans-serif;
-        }
+    <meta charset="UTF-8" />
+    <title>ASL Predictor with Skeleton</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 
-        #video {
-            transform: scaleX(-1);
-        }
-
-        #label {
-            font-size: 32px;
-            margin-top: 10px;
-        }
-    </style>
-
-    <!-- ✅ MediaPipe CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <!-- TensorFlow.js + Hand Pose Detection -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/hand-pose-detection"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
 </head>
 
 <body>
+    <nav class="mb-6 w-full max-w-6xl">
+        <ul class="flex py-4 border-b p-4 bg-white shadow-lg rounded-lg">
+            <li><a href="/" class="text-blue-600 hover:underline mr-4">Home</a></li>
+            <li><a href="/app" class="text-blue-600 hover:underline mr-4">Camera App</a></li>
+            <li><a href="/test" class="text-blue-600 hover:underline">Image Upload Test</a></li>
+        </ul>
+    </nav>
+    <main class="flex flex-col items-center justify-center bg-gray-100 p-4 space-y-6">
 
-    <h2>ASL Realtime (FastAPI)</h2>
+        <!-- 右カラム（カメラ映像 + ボタン） -->
+        <div class="">
+            <div class="relative inline-block">
+                <!-- カメラ映像 -->
+                <video id="webcam" autoplay playsinline muted class="block"></video>
+                <!-- 骨格描画 -->
+                <canvas id="outputCanvas" class="absolute top-0 left-0 pointer-events-none"></canvas>
 
-    <video id="video" width="640" height="480" autoplay muted></video>
-    <div id="label">...</div>
+                <!-- 推論結果パネル -->
+                <div id="inference"
+                    class="absolute top-0 right-0 m-4 p-4 bg-white bg-opacity-75 rounded shadow-lg z-50">
+                    <div id="result" class="text-sm font-mono text-gray-800 w-full">
+                        <p class="text-2xl font-bold text-center">
+                            <span id="res-class" class="text-5xl"></span>
+                        </p>
+                        <img id="res-image" src="" alt="Uploaded hand"
+                            class="mt-4 border rounded shadow w-full max-w-[100px] hidden mx-auto">
+                    </div>
+                </div>
+            </div>
 
-    <!-- ✅ defer OK -->
-    <script src="js/app.js" defer></script>
+            <!-- 送信ボタン -->
+            <button id="sendBtn" class="w-full max-w-[300px] px-4 py-2 bg-gray-500 text-white rounded">
+                📤 Send Hand to Server
+            </button>
+
+        </div>
+
+        </div>
+    </main>
+
+    <!-- 外部JS -->
+    <script type="module" src="js/app.js"></script>
 </body>
 
 </html>

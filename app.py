@@ -5,29 +5,28 @@ import numpy as np
 import tensorflow as tf
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
-
 from collections import deque
+
 from asl_config import (
-    ASL_CLASSES, T, LAND_DIM, MODEL_DIR, EXTENTION,
-    HAND_WEIGHT, Z_SCALE
+    ASL_CLASSES, T, LAND_DIM,
+    MODEL_DIR, EXTENTION
 )
 
+# ===============================
+# ✅ モデル読み込み
+# ===============================
 MODEL_PATH = os.path.join(MODEL_DIR, f"asl_lstm_landmarks.{EXTENTION}")
-model = tf.keras.models.load_model(MODEL_PATH)
-print("✅ Loaded model:", MODEL_PATH)
 
+print("✅ Loading model:", MODEL_PATH)
+model = tf.keras.models.load_model(MODEL_PATH)
+print("✅ Model loaded successfully")
+
+# ===============================
+# ✅ FastAPI
+# ===============================
 app = FastAPI()
 
-# CORSの許可設定（WebSocketにも効く）
-# origins = [
-#     "http://localhost:3000",
-#     "http://127.0.0.1:3000",
-#     "http://localhost:5500",
-#     "http://127.0.0.1:5500",
-#     "http://localhost:8000",
-#     "http://127.0.0.1:8000",
-# ]
-origins = ["*"]
+origins = ["*"]   # WebSocket を含め完全許可
 
 app.add_middleware(
     CORSMiddleware,
@@ -37,56 +36,72 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# クライアントごとにバッファを保持
-client_buffers = {}
-
+# ===============================
+# ✅ 推論関数（T×225 → softmax → label）
+# ===============================
 def predict_sequence(buffer):
+    # shape = (1, T, 225)
     x = np.array(buffer, dtype=np.float32).reshape(1, T, LAND_DIM)
     pred = model.predict(x, verbose=0)[0]
     idx = int(np.argmax(pred))
     prob = float(pred[idx])
-    return ASL_CLASSES[idx], prob
+    label = ASL_CLASSES[idx]
+    return label, prob
 
-
+# ===============================
+# ✅ WebSocket
+# ===============================
 @app.websocket("/ws")
 async def websocket_endpoint(ws: WebSocket):
     await ws.accept()
-
-    # 接続ごとに独立した landmark buffer
-    landmark_buffer = deque(maxlen=T)
-
     print("✅ Client connected")
+
+    # WebSocketごとに landmark buffer を独立保持
+    buffer = deque(maxlen=T)
 
     while True:
         try:
-            data = await ws.receive_text()
-        except:
+            msg = await ws.receive_text()
+        except Exception:
             print("❌ Client disconnected")
-            return
+            break
 
-        # data = JSON文字列
-        obj = json.loads(data)
-        vec = obj["landmark"]  # shape: 225 list
+        try:
+            obj = json.loads(msg)
+            vec = obj.get("landmark", [])
+        except:
+            continue
 
-        # landmark buffer に追加
-        landmark_buffer.append(vec)
+        # landmark をバッファに追加
+        if len(vec) == LAND_DIM:
+            buffer.append(vec)
 
+        # 返却用データ
         result = {
-            "label": None,
-            "prob": 0.0,
-            "ready": False
+            "ready": False,
+            "label": "...",
+            "prob": 0.0
         }
 
-        # T フレーム揃ったら推論
-        if len(landmark_buffer) == T:
-            label, prob = predict_sequence(landmark_buffer)
+        # Tフレーム揃ったら推論
+        if len(buffer) == T:
+            label, prob = predict_sequence(buffer)
+            result["ready"] = True
             result["label"] = label
             result["prob"] = prob
-            result["ready"] = True
 
+        print(result)
+        # クライアントへ返信
         await ws.send_text(json.dumps(result))
 
 
+# ===============================
+# ✅ 実行
+# ===============================
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=8000)
+    uvicorn.run(
+        "app:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True
+    )
