@@ -1,9 +1,5 @@
-"""
-train_multimodal_asl_hands.py
-ASL学習モデル (方法C: hands専用入力付き4入力構成)
-"""
-
 from asl_config import ASL_CLASSES, DATA_DIR, MODEL_DIR, EXTENTION, IMAGE_SIZE
+from asl_config import HAND_WEIGHT
 from utils.landmark_extractor import extract_landmarks_from_image
 import os
 import json
@@ -71,22 +67,30 @@ def load_landmarks(json_path):
 
     pose_points, hand_points = [], []
 
+    # Pose部分（33点×3 = 99次元）
     if "pose" in data and isinstance(data["pose"], list):
         for lm in data["pose"]:
             pose_points.extend([lm["x_norm"], lm["y_norm"], lm["z_norm"]])
 
+    # Hand部分（最大21点×2×3 = 126次元）
     if "hands" in data and isinstance(data["hands"], list):
         for hand in data["hands"]:
             for lm in hand:
                 hand_points.extend([lm["x_norm"], lm["y_norm"], lm["z_norm"]])
 
-    combined = np.array(pose_points + hand_points, dtype=np.float32)
+    # ----- ✅ 指の重みづけ：Hands部分を強調 -----
+    hand_points = np.array(hand_points, dtype=np.float32) * HAND_WEIGHT
+    pose_points = np.array(pose_points, dtype=np.float32)
+
+    combined = np.concatenate([pose_points, hand_points], axis=0)
+
+    # 長さ調整（225次元）
     if len(combined) < 225:
         combined = np.pad(combined, (0, 225 - len(combined)))
     else:
         combined = combined[:225]
-    return combined
 
+    return combined
 
 def load_dataset(base_dir, classes, image_size=(64, 64)):
     X_img, X_skel, X_land, X_hand, y = [], [], [], [], []
