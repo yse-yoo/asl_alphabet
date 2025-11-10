@@ -4,9 +4,12 @@ ASL LSTM 時系列モデル（225次元）リアルタイム予測
 """
 
 from asl_config import (
-    ASL_CLASSES, MODEL_DIR, PROB_THRESH, PRED_SMOOTH, T, LAND_DIM,
+    ASL_CLASSES, MODEL_DIR, GESTURE_MODEL,
+    PROB_THRESH, PRED_SMOOTH, T, LAND_DIM,
     START_MOV_THRESH, STOP_MOV_THRESH, START_FRAMES, STOP_FRAMES,
-    HAND_WEIGHT, Z_SCALE, EXTENTION
+    HAND_WEIGHT, Z_SCALE, EXTENTION, POSE_DIM, HANDS_DIM,
+    HAND_CONFIDENCE, POSE_CONFIDENCE,
+    VIDEO_WIDTH, VIDEO_HEIGHT
 )
 
 import os
@@ -20,7 +23,7 @@ import time
 # =====================================================
 # モデル読み込み
 # =====================================================
-MODEL_PATH = os.path.join(MODEL_DIR, f"asl_lstm_landmarks.{EXTENTION}")
+MODEL_PATH = os.path.join(MODEL_DIR, GESTURE_MODEL)
 model = tf.keras.models.load_model(MODEL_PATH)
 CLASSES = ASL_CLASSES
 
@@ -36,17 +39,12 @@ mp_draw  = mp.solutions.drawing_utils
 hands = mp_hands.Hands(
     static_image_mode=False,
     max_num_hands=2,
-    min_detection_confidence=0.5
+    min_detection_confidence=HAND_CONFIDENCE
 )
 pose = mp_pose.Pose(
     static_image_mode=False,
-    min_detection_confidence=0.65
+    min_detection_confidence=POSE_CONFIDENCE
 )
-
-POSE_DIM = 33 * 3     # 99
-HANDS_DIM = 21 * 2 * 3  # 126
-# LAND_DIM = 225  # asl_config から読み込み
-
 
 # =====================================================
 # 1フレーム → (225,) ベクトル（train と完全一致）
@@ -99,8 +97,8 @@ def extract_landmark_vec(frame_bgr: np.ndarray) -> np.ndarray:
 def draw_texts(frame, label, prob, state, mov, fps):
     h, w = frame.shape[:2]
 
-    cv2.putText(frame, f"STATE:{state}  MOV:{mov:.4f}", (10, 28),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (180,180,255), 2)
+    # cv2.putText(frame, f"STATE:{state}  MOV:{mov:.4f}", (10, 28),
+    #             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (180,180,255), 2)
 
     if label:
         cv2.putText(frame, f"{label} ({prob:.2f})", (10, 60),
@@ -109,8 +107,8 @@ def draw_texts(frame, label, prob, state, mov, fps):
         cv2.putText(frame, "...", (10, 60),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.0, (140,140,140), 2)
 
-    cv2.putText(frame, f"FPS:{fps:.1f}", (w - 160, 28),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (250,220,80), 2)
+    # cv2.putText(frame, f"FPS:{fps:.1f}", (w - 160, 28),
+    #             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (250,220,80), 2)
 
 
 # =====================================================
@@ -122,8 +120,8 @@ def main():
         print("❌ カメラが開けない")
         return
 
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH,  1280)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH,  VIDEO_WIDTH)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, VIDEO_HEIGHT)
 
     landmark_buf = deque(maxlen=T)
     preds_buf    = deque(maxlen=PRED_SMOOTH)

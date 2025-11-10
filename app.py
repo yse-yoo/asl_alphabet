@@ -102,6 +102,7 @@ async def websocket_endpoint(ws: WebSocket):
         # 安全な送信
         # ----------------------
         try:
+            # print("➡️", result)
             await ws.send_text(json.dumps(result))
         except Exception:
             print("❌ Client disconnected during send")

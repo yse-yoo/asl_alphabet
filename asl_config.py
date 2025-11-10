@@ -4,6 +4,9 @@ ASL_CLASSES = [
     "Nothing",
     "Thank_You",
     "YES",
+    "NO",
+    "SORRY",
+    "HELP",
 ]
 
 # 表示用マッピング
@@ -13,7 +16,16 @@ LABEL_MAP = {
     "Nothing": "Nothing",
     "Thank_You": "Thank You",
     "YES": "Yes",
+    "NO": "No",
+    "SORRY": "Sorry",
+    "HELP": "Help",
 }
+
+VIDEO_WIDTH = 1280
+VIDEO_HEIGHT = 720
+
+HAND_CONFIDENCE = 0.5   # 手のランドマークの接続線の太さ
+POSE_CONFIDENCE = 0.65  # ポーズのランドマークの接続線の太さ
 
 HAND_WEIGHT = 2.5  # 手のランドマークの重み付け
 
@@ -39,6 +51,7 @@ START_FRAMES = 5          # 動作開始フレーム数
 STOP_FRAMES = 10          # 動作停止フレーム数
 
 
+GESTURE_MODEL="asl_lstm_landmarks.keras"
 USE_MODEL="asl_multimodal_model_hands"
 ALPHABET_DIR = "asl_alphabet_train"
 VIDEO_DIR = "asl_videos"
