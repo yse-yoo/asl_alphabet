@@ -20,6 +20,8 @@ import tensorflow as tf
 from collections import deque
 import time
 
+from utils.draw_skelton import draw_skeleton_points
+
 # =====================================================
 # モデル読み込み
 # =====================================================
@@ -80,6 +82,7 @@ def extract_landmark_vec(frame_bgr: np.ndarray) -> np.ndarray:
                     lm.y,
                     lm.z * Z_SCALE
                 ])
+
     hands_arr = np.array(hand_vals, dtype=np.float32) * HAND_WEIGHT
     if hands_arr.size < HANDS_DIM:
         hands_arr = np.pad(hands_arr, (0, HANDS_DIM - hands_arr.size))
@@ -90,15 +93,11 @@ def extract_landmark_vec(frame_bgr: np.ndarray) -> np.ndarray:
     vec225 = np.concatenate([pose_arr, hands_arr], axis=0)
     return vec225.astype(np.float32)
 
-
 # =====================================================
-# 描画ユーティリティ
+# 描画テキスト
 # =====================================================
 def draw_texts(frame, label, prob, state, mov, fps):
     h, w = frame.shape[:2]
-
-    # cv2.putText(frame, f"STATE:{state}  MOV:{mov:.4f}", (10, 28),
-    #             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (180,180,255), 2)
 
     if label:
         cv2.putText(frame, f"{label} ({prob:.2f})", (10, 60),
@@ -107,12 +106,9 @@ def draw_texts(frame, label, prob, state, mov, fps):
         cv2.putText(frame, "...", (10, 60),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.0, (140,140,140), 2)
 
-    # cv2.putText(frame, f"FPS:{fps:.1f}", (w - 160, 28),
-    #             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (250,220,80), 2)
-
 
 # =====================================================
-# メインループ（Cモード）
+# メインループ（点のみ描画）
 # =====================================================
 def main():
     cap = cv2.VideoCapture(0)
@@ -189,25 +185,21 @@ def main():
             else:
                 label = None
 
-        # ---- スケルトン描画 ----
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         p_res = pose.process(rgb)
         h_res = hands.process(rgb)
-        if p_res.pose_landmarks:
-            mp_draw.draw_landmarks(frame, p_res.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-        if h_res.multi_hand_landmarks:
-            for hl in h_res.multi_hand_landmarks:
-                mp_draw.draw_landmarks(frame, hl, mp_hands.HAND_CONNECTIONS)
 
-        # ---- FPS ----
+        # Pose, Hands 点
+        draw_skeleton_points(frame, p_res, h_res)
+
+        # ---- FPS / テキスト ----
         t_now = time.time()
         fps = 1.0 / (t_now - t_prev)
         t_prev = t_now
-
         draw_texts(frame, label, prob, "ACTIVE" if active else "IDLE", movement, fps)
 
-        # ---- show ----
         cv2.imshow("ASL LSTM Realtime", frame)
+
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
 

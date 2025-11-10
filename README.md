@@ -63,29 +63,29 @@ python capture_words.py
 ```
 
 ### Training
-training by images of asl_words_train/
+### movie
+```bash
+python train_gesture.py
+```
 
+#### static image
 ```bash
 python train_words.py
 ```
 
 ### Predict
-predict by images of custom_test/
+#### movie
+```bash
+python predict_gesture.py
+```
+
+#### static image
 ```bash
 python predict_words.py
 ```
 
 
 ## サーバ起動
-### main.py の場合
-```bash
-uvicorn main:app --reload --port 8000  
-```
-
-```bash
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-```
-
 ### app.py の場合
 ```bash
 uvicorn app:app --host 0.0.0.0 --port 8000 --reload

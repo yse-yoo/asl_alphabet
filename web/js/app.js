@@ -37,11 +37,17 @@ async function setupCamera() {
     const stream = await navigator.mediaDevices.getUserMedia({
         video: { width: VIDEO_WIDTH, height: VIDEO_HEIGHT }
     });
+
     video.srcObject = stream;
     await video.play();
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    // 内部ピクセルサイズ
+    canvas.width  = VIDEO_WIDTH;
+    canvas.height = VIDEO_HEIGHT;
+
+    // ✅ 見た目のサイズを video と完全一致させる（ズレ防止）
+    canvas.style.width  = VIDEO_WIDTH + "px";
+    canvas.style.height = VIDEO_HEIGHT + "px";
 }
 
 // ===============================

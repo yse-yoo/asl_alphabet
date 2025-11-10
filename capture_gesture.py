@@ -8,6 +8,8 @@ import tkinter as tk
 from tkinter import ttk
 from datetime import datetime
 
+from utils.draw_skelton import draw_skeleton_points
+
 # =========================
 # 設定
 # =========================
@@ -174,19 +176,14 @@ def capture_loop():
         return
 
     h, w, _ = frame.shape
-    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-    # MediaPipe処理
+    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     hands_res = hands.process(rgb)
     pose_res = pose.process(rgb)
     draw_frame = frame.copy()
 
-    if pose_res.pose_landmarks:
-        mp_draw.draw_landmarks(draw_frame, pose_res.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-
-    if hands_res.multi_hand_landmarks:
-        for hl in hands_res.multi_hand_landmarks:
-            mp_draw.draw_landmarks(draw_frame, hl, mp_hands.HAND_CONNECTIONS)
+    # Pose, Hands 点
+    draw_skeleton_points(frame, p_res, h_res)
 
     # =========================
     # カウントダウン処理
