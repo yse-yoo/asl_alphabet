@@ -33,8 +33,8 @@ def load_image(path, size=(64, 64)):
     return img.astype("float32") / 255.0
 
 
+"""extract_landmarks_from_image() の出力を225次元ベクトルに変換"""
 def flatten_landmarks(landmark_dict):
-    """extract_landmarks_from_image() の出力を225次元ベクトルに変換"""
     pose_points, hand_points = [], []
 
     if "pose" in landmark_dict and landmark_dict["pose"]:
@@ -58,10 +58,6 @@ def flatten_landmarks(landmark_dict):
 # 1枚を予測（JSONなし対応版）
 # ==============================
 def predict_sample(base_path, use_json=False):
-    """
-    use_json=True の場合は既存 .json を使用
-    False の場合は MediaPipe でリアルタイム抽出
-    """
     base_name = os.path.splitext(base_path)[0]
     img_path = base_name + ".jpg"
     skel_path = base_name + "_skel.jpg"

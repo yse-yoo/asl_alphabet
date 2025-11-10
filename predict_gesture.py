@@ -96,7 +96,7 @@ def extract_landmark_vec(frame_bgr: np.ndarray) -> np.ndarray:
 # =====================================================
 # 描画テキスト
 # =====================================================
-def draw_texts(frame, label, prob, state, mov, fps):
+def draw_texts(frame, label, prob):
     h, w = frame.shape[:2]
 
     if label:
@@ -104,7 +104,7 @@ def draw_texts(frame, label, prob, state, mov, fps):
                     cv2.FONT_HERSHEY_SIMPLEX, 1.0, (80,255,80), 2)
     else:
         cv2.putText(frame, "...", (10, 60),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1.0, (140,140,140), 2)
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.0, (80,255,80), 2)
 
 
 # =====================================================
@@ -193,10 +193,10 @@ def main():
         draw_skeleton_points(frame, p_res, h_res)
 
         # ---- FPS / テキスト ----
-        t_now = time.time()
-        fps = 1.0 / (t_now - t_prev)
-        t_prev = t_now
-        draw_texts(frame, label, prob, "ACTIVE" if active else "IDLE", movement, fps)
+        # t_now = time.time()
+        # fps = 1.0 / (t_now - t_prev)
+        # t_prev = t_now
+        draw_texts(frame, label, prob)
 
         cv2.imshow("ASL LSTM Realtime", frame)
 
